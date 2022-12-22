@@ -36,7 +36,9 @@ def extract_dict_structure(dictionary: dict) -> dict:
                 structure[f"[{key}]"] = sub_structure
     return structure
 
-
+# split_in_sessions performs the following operation:
+# if the time difference between the current message and the last message is greater than delta_h_threshold,
+# then the session_token is added to the chat_text list.
 def split_in_sessions(t_current, t_last, chat_text, delta_h_threshold, session_token):
     if session_token:
         if t_last and t_current:

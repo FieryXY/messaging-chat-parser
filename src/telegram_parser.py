@@ -16,10 +16,7 @@ OTHERS_TAG = "[others]"
 TELEGRAM_STOP_WORDS = [word.replace('\n', '') for word in open('./data/resources/Telegram_stopwords.txt').readlines()]
 
 
-def save_messages_parsed(output_path, user_messages):
-    output_file = os.path.join(output_path, "telegram-chats.txt")
-    with open(output_file, 'w') as f:
-        [f.write(f"{msg}\n") for msg in user_messages]
+
 
 
 def stop_word_checker(actor, invalid_lines, text):
@@ -61,6 +58,8 @@ def messages_parser(personal_chat, telegram_data, session_info: dict):
     logging.info(f"N° {len(invalid_lines)} invalid lines found, top 5: {invalid_lines[:5]}")
     return usr_messages
 
+    # usr_messages, invalid_lines, split_in_sessions, stop_word_checker
+
 
 def load_data(json_path):
     with open(json_path, 'r') as f:
@@ -85,6 +84,8 @@ def run(json_path: str,
 
     logging.info(f"Start parsing telegram messages...")
     user_messages = messages_parser(personal_chat, telegram_data, session_info)
+
+    
 
     logging.info(f"Saving {len(user_messages)}^ telegram messages...")
     save_messages_parsed(output_path, user_messages)
