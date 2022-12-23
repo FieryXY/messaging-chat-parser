@@ -26,8 +26,11 @@ def save_messages_parsed(output_path, user_messages):
 def load_data(csv_path: str):
     with open(csv_path, 'r') as f:
         #Parse the csv file
-        discord_data = csv.reader(f, delimiter=',')
-    return discord_data
+        discord_reader = csv.reader(f, delimiter=',')
+        discord_data = []
+        for row in discord_reader:
+            discord_data.append(row)
+        return discord_data
 
 def stop_word_checker(actor, invalid_lines, text):
     if type(text) != str:  # Telegram save links under 'text' key, but they are dictionary / list
@@ -45,7 +48,11 @@ def messages_parser(discord_data, session_info, usr_id):
     invalid_lines = []
     t_last = None
 
-    for row in discord_data:
+    for idx, row in enumerate(discord_data):
+
+        if idx == 0:  # Skip header
+            continue
+
         actor = row[0]
         text = row[3]
         t_current = datetime.strptime(row[2], datetime_format)
