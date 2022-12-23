@@ -90,6 +90,7 @@ def run(csv_path: str,
         discord_data = load_data(file_path)
         user_messages = messages_parser(discord_data, session_info, usr_id)
         all_data.extend(user_messages)
+        all_data.append(session_info['session_token'])
 
     logging.info(f"Saving {len(user_messages)}^ Discord messages...")
     save_messages_parsed(output_path, all_data)

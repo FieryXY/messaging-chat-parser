@@ -33,10 +33,46 @@ function findChildElementByIdSubstring(element, substring) {
             return element.children[i];
         }
     }
+    return null;
+}
+
+function waitForClassSubstring(ms, element, substring) {
+    return new Promise(resolve => setInterval(function() {
+        if (findChildElementByClassSubstring(element, substring)) {
+            resolve();
+        }
+    }, ms));
+}
+
+function waitForIdSubstring(ms, element, substring) {
+    return new Promise(resolve => setInterval(function() {
+        if (findChildElementByIdSubstring(element, substring)) {
+            resolve();
+        }
+    }, ms));
+}
+
+function loadProofChildElementByClassSubstring(element, substring) {
+    let child = findChildElementByClassSubstring(element, substring);
+    if (child) {
+        return child;
+    }
+    waitForClassSubstring(10, element, substring);
+    return findChildElementByClassSubstring(element, substring);
+}
+
+function loadProofChildElementByIdSubstring(element, substring) {
+    let child = findChildElementByIdSubstring(element, substring);
+    if (child) {
+        return child;
+    }
+    waitForIdSubstring(10, element, substring);
+    return findChildElementByIdSubstring(element, substring);
 }
 
 function parseSearchPanel() {
-    msgs = document.getElementsByClassName("container-rZM65Y")
+    msgs = document.getElementsByClassName("container-rZM65Y");
+    console.log("Found " + msgs.length + " messages");
     data = Array.from(msgs).map(msg => {
         let searchResult = findChildElementByClassSubstring(msg, "searchResult");
         let message = findChildElementByClassSubstring(searchResult, "message");
@@ -68,23 +104,44 @@ function nextPage() {
     return false;
 }
 
-//Js synchronous sleep
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+function waitForNoExist(ms) {
+    return new Promise(resolve => setInterval(function() {
+        if (document.getElementsByClassName("container-rZM65Y").length == 0) {
+            resolve();
+        }
+    }, ms));
 }
+
+function waitForExist(ms) {
+    return new Promise(resolve => setInterval(function() {
+        if (document.getElementsByClassName("container-rZM65Y").length > 0) {
+            resolve();
+        }
+    }, ms));
+
+}
+
 
 function nextDay() {
     date = new Date(date.getTime() + 86400000);
-
 }
 
 async function parseDay() {
+    let pageNum = 1;
     while (true) {
+        console.log("Beginning Page " + pageNum);
         allData = allData.concat(parseSearchPanel());
         if (!nextPage()) {
             break;
         }
-        await sleep(10000);
+
+        console.log("Awaiting Next Page")
+        await waitForNoExist(10);
+        console.log("Discovered No Longer Exist")
+        await waitForExist(10);
+        console.log("Discovered Exist")
+
+        pageNum++;
     }
     console.log(allData);
 }
