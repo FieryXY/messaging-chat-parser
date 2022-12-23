@@ -71,12 +71,14 @@ def run(csv_path: str,
         output_path: str,
         session_token: str,
         delta_h_threshold: int,
-        time_format: str):
+        time_format: str,
+        discord_user_id: str
+        ):
     session_info = {"session_token": session_token,
                     "delta_h_threshold": delta_h_threshold,
                     "time_format": time_format}
     
-    txt_files_name, txt_files_paths = get_dir_files(dir_path=chats_path, extension_filter=".txt")
+    txt_files_name, txt_files_paths = get_dir_files(dir_path=csv_path, extension_filter=".csv")
     logging.info(f"Found {len(txt_files_paths)} txt files in `{csv_path}` folder: {txt_files_paths}")
 
     logging.info(f"Loading Discord data at {csv_path}...")
@@ -88,7 +90,7 @@ def run(csv_path: str,
     all_data = []
     for file_name, file_path in zip(txt_files_name, txt_files_paths):
         discord_data = load_data(file_path)
-        user_messages = messages_parser(discord_data, session_info, usr_id)
+        user_messages = messages_parser(discord_data, session_info, discord_user_id)
         all_data.extend(user_messages)
         all_data.append(session_info['session_token'])
 
@@ -97,7 +99,7 @@ def run(csv_path: str,
 
 def main(argv):
     parser = argparse.ArgumentParser(prog=argv[0])
-    parser.add_argument('--csv_path', type=str, required=False, default="./data/chat_raw/discord/full_discord.json",
+    parser.add_argument('--csv_path', type=str, required=False, default="./data/chat_raw/discord/",
                         help="Path to the concatenated Discord CSVs created from Discord Chat Exporter")
     parser.add_argument('--output_path', type=str, default="./data/chat_parsed/")
     parser.add_argument('--session_token', type=str,
